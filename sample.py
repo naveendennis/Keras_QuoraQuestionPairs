@@ -260,7 +260,7 @@ if __name__ == '__main__':
                       optimizer='adam',
                       metrics=['mae', 'acc'])
         print(model.summary())
-        model.fit(feature_train, label_train, epochs=1000, batch_size=100)
+        model.fit(feature_train, label_train, epochs=3, batch_size=5000)
 
         with open(filename, 'wb') as f:
             pickle.dump(model, f)
