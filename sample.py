@@ -139,11 +139,14 @@ def get_phrase_vector(phrase_obj):
 
 
 def get_features(features, operation='train'):
+    extension = '.den'
+    extension = operation + extension
+
     row = features.shape[0]
     phrase_vectors1 = translate(features[:, 0].astype(str), table=translator)
     phrase_vectors2 = translate(features[:, 1].astype(str), table=translator)
 
-    filename = os.path.join(dir_path, 'data', 'sentiment_vectors_' + operation)
+    filename = os.path.join(dir_path, 'data', 'sentiment_vectors_' + extension)
     if not os.path.exists(filename):
         sentiment_vector1 = np.array([Sentence(each).polarity for each in phrase_vectors1]).reshape(row, 1)
         sentiment_vector2 = np.array([Sentence(each).polarity for each in phrase_vectors2]).reshape(row, 1)
@@ -155,7 +158,7 @@ def get_features(features, operation='train'):
             sentiment_vector1 = pickle.load(f)
             sentiment_vector2 = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data', 'subjective_vectors_' + operation)
+    filename = os.path.join(dir_path, 'data', 'subjective_vectors_' + extension)
     if not os.path.exists(filename):
         subjective_vectors1 = np.array([Sentence(each).subjectivity for each in phrase_vectors1]).reshape(row, 1)
         subjective_vectors2 = np.array([Sentence(each).subjectivity for each in phrase_vectors2]).reshape(row, 1)
@@ -167,7 +170,7 @@ def get_features(features, operation='train'):
             subjective_vectors1 = pickle.load(f)
             subjective_vectors2 = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data', 'fuzzy_wuzzy_partial_ratio_' + operation)
+    filename = os.path.join(dir_path, 'data', 'fuzzy_wuzzy_partial_ratio_' + extension)
     if not os.path.exists(filename):
         partial_ratio_vector1 = get_fuzzy_partial_vector(phrase_vectors1).reshape(row, 1)
         partial_ratio_vector2 = get_fuzzy_partial_vector(phrase_vectors2).reshape(row, 1)
@@ -179,7 +182,7 @@ def get_features(features, operation='train'):
             partial_ratio_vector1 = pickle.load(f)
             partial_ratio_vector2 = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data', 'raw_phrase_vectors_' + operation)
+    filename = os.path.join(dir_path, 'data', 'raw_phrase_vectors_' + extension)
     if not os.path.exists(filename):
         phrase_vectors1 = np.vectorize(get_phrase_vector_obj)(phrase_vectors1)
         phrase_vectors2 = np.vectorize(get_phrase_vector_obj)(phrase_vectors2)
@@ -191,7 +194,7 @@ def get_features(features, operation='train'):
             phrase_vectors1 = pickle.load(f)
             phrase_vectors2 = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data', 'cosine_similarity_vector_' + operation)
+    filename = os.path.join(dir_path, 'data', 'cosine_similarity_vector_' + extension)
     if not os.path.exists(filename):
         cosine_similarity_vector = get_cosine_similarity_vector(phrase_vectors1, phrase_vectors2).reshape(row, 1)
         with open(filename, 'wb') as f:
@@ -200,7 +203,7 @@ def get_features(features, operation='train'):
         with open(filename, 'rb') as f:
             cosine_similarity_vector = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data', 'processed_phrase_vectors_' + operation)
+    filename = os.path.join(dir_path, 'data', 'processed_phrase_vectors_' + extension)
     if not os.path.exists(filename):
         phrase_vectors1 = get_phrase_vector(phrase_vectors1).reshape(row, 300)
         phrase_vectors2 = get_phrase_vector(phrase_vectors2).reshape(row, 300)
