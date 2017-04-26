@@ -10,6 +10,10 @@ import nltk
 from textblob import Sentence
 from numpy.core.defchararray import *
 from fuzzywuzzy import fuzz
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+from keras.layers.embeddings import Embedding
 
 
 class PhraseVector:
@@ -48,7 +52,7 @@ class PhraseVector:
 
     def get_cosine_similarity(self, other_vector):
         cosine_similarity = np.dot(self.vector, other_vector.vector) / (
-        np.linalg.norm(self.vector) * np.linalg.norm(other_vector.vector))
+            np.linalg.norm(self.vector) * np.linalg.norm(other_vector.vector))
         try:
             if math.isnan(cosine_similarity):
                 cosine_similarity = 0
@@ -128,9 +132,9 @@ def get_phrase_vector(phrase_obj):
     phrase_vector = []
     for each in phrase_obj:
         if type(each.vector) is np.ndarray:
-            phrase_vector = each.vector.tolist()+phrase_vector
+            phrase_vector = each.vector.tolist() + phrase_vector
         else:
-            phrase_vector = [13]*300 + phrase_vector
+            phrase_vector = [13] * 300 + phrase_vector
     return np.array([phrase_vector])
 
 
@@ -139,7 +143,7 @@ def get_features(features, operation='train'):
     phrase_vectors1 = translate(features[:, 0].astype(str), table=translator)
     phrase_vectors2 = translate(features[:, 1].astype(str), table=translator)
 
-    filename = os.path.join(dir_path, 'data','sentiment_vectors_'+operation)
+    filename = os.path.join(dir_path, 'data', 'sentiment_vectors_' + operation)
     if not os.path.exists(filename):
         sentiment_vector1 = np.array([Sentence(each).polarity for each in phrase_vectors1]).reshape(row, 1)
         sentiment_vector2 = np.array([Sentence(each).polarity for each in phrase_vectors2]).reshape(row, 1)
@@ -151,7 +155,7 @@ def get_features(features, operation='train'):
             sentiment_vector1 = pickle.load(f)
             sentiment_vector2 = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data','subjective_vectors_'+operation)
+    filename = os.path.join(dir_path, 'data', 'subjective_vectors_' + operation)
     if not os.path.exists(filename):
         subjective_vectors1 = np.array([Sentence(each).subjectivity for each in phrase_vectors1]).reshape(row, 1)
         subjective_vectors2 = np.array([Sentence(each).subjectivity for each in phrase_vectors2]).reshape(row, 1)
@@ -163,10 +167,10 @@ def get_features(features, operation='train'):
             subjective_vectors1 = pickle.load(f)
             subjective_vectors2 = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data','fuzzy_wuzzy_partial_ratio_'+operation)
+    filename = os.path.join(dir_path, 'data', 'fuzzy_wuzzy_partial_ratio_' + operation)
     if not os.path.exists(filename):
         partial_ratio_vector1 = get_fuzzy_partial_vector(phrase_vectors1).reshape(row, 1)
-        partial_ratio_vector2= get_fuzzy_partial_vector(phrase_vectors2).reshape(row, 1)
+        partial_ratio_vector2 = get_fuzzy_partial_vector(phrase_vectors2).reshape(row, 1)
         with open(filename, 'wb') as f:
             pickle.dump(partial_ratio_vector1, f)
             pickle.dump(partial_ratio_vector2, f)
@@ -175,7 +179,7 @@ def get_features(features, operation='train'):
             partial_ratio_vector1 = pickle.load(f)
             partial_ratio_vector2 = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data', 'raw_phrase_vectors_'+operation)
+    filename = os.path.join(dir_path, 'data', 'raw_phrase_vectors_' + operation)
     if not os.path.exists(filename):
         phrase_vectors1 = np.vectorize(get_phrase_vector_obj)(phrase_vectors1)
         phrase_vectors2 = np.vectorize(get_phrase_vector_obj)(phrase_vectors2)
@@ -187,7 +191,7 @@ def get_features(features, operation='train'):
             phrase_vectors1 = pickle.load(f)
             phrase_vectors2 = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data','cosine_similarity_vector_'+operation)
+    filename = os.path.join(dir_path, 'data', 'cosine_similarity_vector_' + operation)
     if not os.path.exists(filename):
         cosine_similarity_vector = get_cosine_similarity_vector(phrase_vectors1, phrase_vectors2).reshape(row, 1)
         with open(filename, 'wb') as f:
@@ -196,7 +200,7 @@ def get_features(features, operation='train'):
         with open(filename, 'rb') as f:
             cosine_similarity_vector = pickle.load(f)
 
-    filename = os.path.join(dir_path, 'data', 'processed_phrase_vectors_'+operation)
+    filename = os.path.join(dir_path, 'data', 'processed_phrase_vectors_' + operation)
     if not os.path.exists(filename):
         phrase_vectors1 = get_phrase_vector(phrase_vectors1).reshape(row, 300)
         phrase_vectors2 = get_phrase_vector(phrase_vectors2).reshape(row, 300)
@@ -207,22 +211,27 @@ def get_features(features, operation='train'):
         with open(filename, 'rb') as f:
             phrase_vectors1 = pickle.load(f)
             phrase_vectors2 = pickle.load(f)
+    #
+    # features = np.concatenate((phrase_vectors1, phrase_vectors2, cosine_similarity_vector, partial_ratio_vector1,
+    #                            partial_ratio_vector2, subjective_vectors1, subjective_vectors2, sentiment_vector1,
+    #                            sentiment_vector2), axis=1)
 
-    features = np.concatenate((cosine_similarity_vector, partial_ratio_vector1, partial_ratio_vector2, subjective_vectors1, subjective_vectors2, sentiment_vector1, sentiment_vector2, phrase_vectors1, phrase_vectors2), axis=1)
+    features = np.concatenate((phrase_vectors1, phrase_vectors2), axis=1)
+
     return features
 
 
 if __name__ == '__main__':
     dir_name = os.path.dirname(os.path.realpath(__file__))
-    TRAIN_FILE = os.path.join(dir_name , 'dataset','train.csv')
-    TEST_FILE = os.path.join(dir_name,  'dataset','test.csv')
+    TRAIN_FILE = os.path.join(dir_name, 'dataset', 'train.csv')
+    TEST_FILE = os.path.join(dir_name, 'dataset', 'test.csv')
     THRESHOLD_VALUE = 0.8
     translator = str.maketrans(' ', ' ', string.punctuation)
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    model_filename = os.path.join(dir_name ,'data','google_p2v_model')
+    model_filename = os.path.join(dir_name, 'data', 'google_p2v_model')
 
     if not os.path.exists(model_filename):
-        pathToBinVectors = os.path.join(dir_name,'data','GoogleNews-vectors-negative300.bin')
+        pathToBinVectors = os.path.join(dir_name, 'data', 'GoogleNews-vectors-negative300.bin')
         print("Loading the data file... Please wait...")
         word_model = gensim.models.KeyedVectors.load_word2vec_format(pathToBinVectors, binary=True)
         print("Successfully loaded 3.6 G bin file!")
@@ -238,19 +247,26 @@ if __name__ == '__main__':
     labels = train_contents[:, 5].astype(int)
     features = train_contents[:, 3:5]
     from sklearn.model_selection import train_test_split
+
     feature_train, feature_test, label_train, label_test = train_test_split(features, labels, train_size=0.50)
     feature_train = get_features(features=feature_train)
-    filename = os.path.join(dir_path , 'data', 'svm_plain')
+    filename = os.path.join(dir_path, 'data', 'keras_RNN')
     if not os.path.exists(filename):
-        from sklearn.svm import SVC
-        clf = SVC()
+        model = Sequential()
+        model.add(Embedding(600, 100, input_length=600))
+        model.add(LSTM(100))
+        model.add(Dense(1, activation="sigmoid"))
+        model.compile(loss='mean_squared_error',
+                      optimizer='adam',
+                      metrics=['mae', 'acc'])
+        print(model.summary())
+        model.fit(feature_train, label_train, epochs=1000, batch_size=100)
+
         with open(filename, 'wb') as f:
-            pickle.dump(clf, f)
+            pickle.dump(model, f)
     else:
         with open(filename, 'rb') as f:
-            clf = pickle.load(f)
-
+            model = pickle.load(f)
     feature_test = get_features(features=feature_test, operation='test')
-    from sklearn.model_selection import cross_val_score
-    accuracy = cross_val_score(clf, feature_test, label_test)
-    print('Accuracy: ', accuracy)
+    scores = model.evaluate(feature_test, label_test, verbose=1)
+    print("Accuracy: %.2f%%" % (scores[1] * 100))
