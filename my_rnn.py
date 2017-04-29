@@ -23,7 +23,7 @@ if __name__ == '__main__':
     filename = os.path.join(dir_path, 'data', 'feature_train_test')
     if not os.path.exists(filename):
 
-        data_contents = pd.read_csv("dataset/train.csv", sep=', ', delimiter=',', header='infer', names=None)
+        data_contents = pd.read_csv(os.path.join(dir_path, 'dataset','train.csv'), sep=', ', delimiter=',', header='infer', names=None)
         data_contents = data_contents.dropna()
 
         feature1 = data_contents['question1'].apply(remove_punctuation)
