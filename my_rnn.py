@@ -3,7 +3,7 @@ import numpy as np
 import string
 from keras.preprocessing import sequence
 from keras.models import Sequential
-from keras.layers.core import Dense
+from keras.layers.core import Dense, Dropout
 from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import LSTM
 import pandas as pd
@@ -49,29 +49,28 @@ if __name__ == '__main__':
     feature_train = feature_train.iloc[:].values
     label_train = label_train.iloc[:].values
 
-    tk = keras.preprocessing.text.Tokenizer(nb_words=2000, lower=True, split=" ")
+    tk = keras.preprocessing.text.Tokenizer(num_words=2000, lower=True, split=" ")
     tk.fit_on_texts(feature_train)
 
     feature_train = tk.texts_to_sequences(feature_train)
 
-    max_len = 80
+    max_len = 1024
     print("max_len ", max_len)
     print('Pad sequences (samples x time)')
 
     feature_train = sequence.pad_sequences(feature_train, maxlen=max_len)
-
+    lstm_size = 256
     max_features = 20000
     model = Sequential()
 
     model = Sequential()
-    model.add(Embedding(max_features, 512, input_length=max_len, dropout=0.2))
-
-    model.add(LSTM(512, recurrent_dropout=0.2, dropout=0.2))
-    model.add(Dense(32, activation='softmax'))
+    model.add(Embedding(max_features, lstm_size, input_length=max_len))
+    model.add(LSTM(lstm_size, recurrent_dropout=0.2))
+    model.add(Dense(64, activation='softmax'))
+    model.add(Dropout(0.2))
     model.add(Dense(1, activation='relu'))
-
     model.compile(loss='binary_crossentropy', optimizer='rmsprop')
-
-    model.fit(feature_train, y=label_train, batch_size=200, epochs=1, verbose=1, validation_split=0.2, shuffle=True)
+    model.summary()
+    model.fit(feature_train, y=label_train, batch_size=300, epochs=1, verbose=1, validation_split=0.2, shuffle=True)
     scores = model.evaluate(feature_test, label_test, verbose=1)
     print("Accuracy: %.2f%%" % (scores[1] * 100))
