@@ -48,15 +48,21 @@ if __name__ == '__main__':
 
     feature_train = feature_train.iloc[:].values
     label_train = label_train.iloc[:].values
+    feature_test = feature_test.iloc[:].values
+    label_test = label_test.iloc[:].values
 
-    tk = keras.preprocessing.text.Tokenizer(num_words=2000, lower=True, split=" ")
+    tk = keras.preprocessing.text.Tokenizer(num_words=10000, lower=True, split=" ")
     tk.fit_on_texts(feature_train)
-
     feature_train = tk.texts_to_sequences(feature_train)
 
     max_len = 1024
     print("max_len ", max_len)
     print('Pad sequences (samples x time)')
+
+    tk = keras.preprocessing.text.Tokenizer(num_words=10000, lower=True, split=" ")
+    tk.fit_on_texts(feature_test)
+    feature_test = tk.texts_to_sequences(feature_test)
+    feature_test = sequence.pad_sequences(feature_test, maxlen=max_len)
 
     feature_train = sequence.pad_sequences(feature_train, maxlen=max_len)
     lstm_size = 256
