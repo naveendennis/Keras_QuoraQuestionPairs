@@ -31,8 +31,7 @@ if __name__ == '__main__':
         feature = feature1 + ' | ' + feature2
         label = data_contents['is_duplicate']
 
-        feature_train, feature_test = train_test_split(feature, train_size=0.20)
-        label_train, label_test = train_test_split(label, train_size=0.20)
+        feature_train, feature_test, label_train, label_test = train_test_split(feature, label, train_size=0.80)
         with open(filename, 'wb') as f:
             pickle.dump(feature_train, f)
             pickle.dump(feature_test, f)
