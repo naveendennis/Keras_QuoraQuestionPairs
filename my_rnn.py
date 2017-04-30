@@ -79,6 +79,6 @@ if __name__ == '__main__':
     model.compile(loss='binary_crossentropy', optimizer='rmsprop')
     model.summary()
     model.fit(feature_train, y=label_train, batch_size=500, epochs=1, verbose=1, validation_split=0.2, shuffle=True)
-    pickle.dump(model, open(os.path.join(dir_path, 'data', 'model', 'RNNmodel_B500_')))
+    pickle.dump(model, open(os.path.join(dir_path, 'data', 'model', 'RNNmodel_B500_'), 'wb'))
     scores = model.evaluate(feature_test, label_test, verbose=1)
     print("Accuracy: %.2f%%" % (scores[1] * 100))
