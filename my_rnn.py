@@ -6,6 +6,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout
 from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import LSTM
+from keras.layers import Bidirectional
 import pandas as pd
 import pickle
 import os.path
@@ -71,14 +72,10 @@ if __name__ == '__main__':
     model = Sequential()
     model.add(Embedding(max_features, lstm_size, input_length=max_len))
     model.add(Dense(512, activation='softmax'))
-    model.add(Dropout(0.2))
-    model.add(LSTM(lstm_size, recurrent_dropout=0.2))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.2))
-    model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+    model.add(Bidirectional(LSTM(lstm_size, recurrent_dropout=0.2)))
+    model.add(Dense(1, activation='relu'))
+    model.compile(loss='mean_squared_error', optimizer='sgd')
     model.summary()
     model.fit(feature_train, y=label_train, batch_size=500, epochs=1, verbose=1, validation_split=0.2, shuffle=True)
-    pickle.dump(model, open(os.path.join(dir_path, 'data', 'model', 'RNNmodel_B500_'), 'wb'))
     scores = model.evaluate(feature_test, label_test, verbose=1)
-    print("Accuracy: %.2f%%" % (scores[1] * 100))
+    print(scores)
