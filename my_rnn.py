@@ -93,7 +93,7 @@ if __name__ == '__main__':
         model.add(Dense(1, activation='relu'))
         model.compile(loss='mean_squared_error', optimizer='adam')
         model.summary()
-        model.fit(feature_train, y=label_train, batch_size=batch_size, epochs=1, verbose=1, validation_split=0.2, shuffle=True)
+        model.fit(feature_train, y=label_train, batch_size=batch_size, epochs=2, verbose=1, validation_split=0.2, shuffle=True)
         model.save(model_name)
     else:
         model = load_model(model_name)
