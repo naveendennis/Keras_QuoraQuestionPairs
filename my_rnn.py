@@ -36,8 +36,8 @@ def pre_processing(data_contents):
 
 if __name__ == '__main__':
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    model_name = '_blstm_rnn_model_B200_adam_mse_'
-    if not os.path.join(dir_path, 'data', model_name):
+    model_name = os.path.join(dir_path, 'data','_blstm_rnn_model_B200_adam_mse_')
+    if not os.path.exists(model_name):
         filename = os.path.join(dir_path, 'data', 'feature_train_test')
         if not os.path.exists(filename):
 
@@ -94,9 +94,9 @@ if __name__ == '__main__':
         model.compile(loss='mean_squared_error', optimizer='adam')
         model.summary()
         model.fit(feature_train, y=label_train, batch_size=batch_size, epochs=1, verbose=1, validation_split=0.2, shuffle=True)
-        model.save(os.path.join(dir_path, 'data', model_name))
+        model.save(model_name)
     else:
-        model = load_model(os.path.join(dir_path, 'data', model_name))
+        model = load_model(model_name)
     
     test_contents = pd.read_csv(os.path.join(dir_path, 'dataset','test.csv'), sep=', ', delimiter=',', header='infer', names=None)
     test_contents = test_contents.dropna()
