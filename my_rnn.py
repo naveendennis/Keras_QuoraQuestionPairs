@@ -102,7 +102,7 @@ if __name__ == '__main__':
     test_contents = test_contents.dropna()
     test_contents = pre_processing(test_contents)
     label_contents = model.predict(test_contents, batch_size=batch_size)
-    with open(os.path.join(dir_path, '_label_test')) as f:
+    with open(os.path.join(dir_path, 'data', '_label_test'),'wb') as f:
         pickle.dump(label_contents, f)
     scores = model.evaluate(feature_test, label_test, verbose=1)
     print(scores)
