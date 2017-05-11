@@ -101,10 +101,10 @@ if __name__ == '__main__':
 	    with open(os.path.join(dir_path, 'data', '_label_test'),'wb') as f:
 	        pickle.dump(label_contents, f)
 	        print('label contents saved...', flush=True)
-	else:
-		with open(os.path.join(dir_path, 'data', '_label_test'), 'rb') as f:
-			label_contents = pickle.load(f)
-			print('label_contents loaded...', flush=True)
+    else:
+        with open(os.path.join(dir_path, 'data', '_label_test'), 'rb') as f:
+            label_contents = pickle.load(f)
+            print('label_contents loaded...', flush=True)
 
     scores = model.evaluate(feature_test, label_test, verbose=1)
     print('Accuracy is ' ,scores, flush=True)
