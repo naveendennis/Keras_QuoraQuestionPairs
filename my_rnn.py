@@ -4,7 +4,7 @@ import string
 from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.models import load_model
-from keras.layers.core import Dense, Dropout
+from keras.layers.core import Dense
 from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import LSTM
 from keras.layers import Bidirectional
@@ -85,17 +85,17 @@ if __name__ == '__main__':
         print('Model is loaded...', flush=True)
     
     if not os.path.exists(model_name):
-	    test_contents = pd.read_csv(os.path.join(dir_path, 'dataset','test.csv'), sep=', ', delimiter=',', header='infer', names=None)
-	    test_contents = test_contents.dropna()
-	    test_contents = pre_processing(test_contents)
-	    label_contents = model.predict(test_contents, batch_size=batch_size)
-	    with open(os.path.join(dir_path, 'data', '_label_test'),'wb') as f:
-	        pickle.dump(label_contents, f)
-	        print('label contents saved...', flush=True)
+        test_contents = pd.read_csv(os.path.join(dir_path, 'dataset','test.csv'), sep=', ', delimiter=',', header='infer', names=None)
+        test_contents = test_contents.dropna()
+        test_contents = pre_processing(test_contents)
+        label_contents = model.predict(test_contents, batch_size=batch_size)
+        with open(os.path.join(dir_path, 'data', '_label_test'),'wb') as f:
+            pickle.dump(label_contents, f)
+            print('label contents saved...', flush=True)
     else:
         with open(os.path.join(dir_path, 'data', '_label_test'), 'rb') as f:
             label_contents = pickle.load(f)
             print('label_contents loaded...', flush=True)
 
     scores = model.evaluate(feature_test, label_test, verbose=1)
-    print('Accuracy is ' ,scores, flush=True)
+    print('Accuracy is ', scores, flush=True)
