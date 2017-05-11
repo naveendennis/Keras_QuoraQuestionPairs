@@ -67,15 +67,6 @@ if __name__ == '__main__':
     model_name = os.path.join(dir_path, 'data','_blstm_rnn_model_B200_adam_mse_')
     if not os.path.exists(model_name):
 
-        tk = keras.preprocessing.text.Tokenizer(num_words=10000, lower=True, split=" ")
-        tk.fit_on_texts(feature_train)
-
-        print("max_len ", max_len)
-        print('Pad sequences (samples x time)')
-
-        tk = keras.preprocessing.text.Tokenizer(num_words=10000, lower=True, split=" ")
-        tk.fit_on_texts(feature_test)
-
         lstm_size = 256
         max_features = 20000
 
