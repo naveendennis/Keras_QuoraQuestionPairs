@@ -84,16 +84,17 @@ if __name__ == '__main__':
         model = load_model(model_name)
         print('Model is loaded...', flush=True)
     
-    if not os.path.exists(model_name):
+    label_test_name = os.path.join(dir_path, 'data', '_label_test')
+    if not os.path.exists(label_test_name):
 	    test_contents = pd.read_csv(os.path.join(dir_path, 'dataset','test.csv'), sep=', ', delimiter=',', header='infer', names=None)
 	    test_contents = test_contents.dropna()
 	    test_contents = pre_processing(test_contents)
 	    label_contents = model.predict(test_contents, batch_size=batch_size)
-	    with open(os.path.join(dir_path, 'data', '_label_test'),'wb') as f:
+	    with open(label_test_name,'wb') as f:
 	        pickle.dump(label_contents, f)
 	        print('label contents saved...', flush=True)
     else:
-        with open(os.path.join(dir_path, 'data', '_label_test'), 'rb') as f:
+        with open(label_test_name, 'rb') as f:
             label_contents = pickle.load(f)
             print('label_contents loaded...', flush=True)
 
