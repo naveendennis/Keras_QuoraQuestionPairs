@@ -25,9 +25,9 @@ def remove_punctuation(s):
 
 def pre_processing(data_contents):
     feature1 = data_contents['question1'].apply(remove_punctuation)
-    feature1 = 'empty ' if type(feature1) is str else feature1 
+    feature1 = '#$%)() ' if type(feature1) is str else feature1 
     feature2 = data_contents['question2'].apply(remove_punctuation)
-    feature2 = 'empty ' if type(feature2) is str else feature2
+    feature2 = '#$%)() ' if type(feature2) is str else feature2
     features = feature1 + ' ~$#|#$~ ' + feature2
     features = features.iloc[:].values
     tk = keras.preprocessing.text.Tokenizer(num_words=10000, lower=True, split=" ")
