@@ -25,7 +25,9 @@ def remove_punctuation(s):
 
 def pre_processing(data_contents):
     feature1 = data_contents['question1'].apply(remove_punctuation)
+    feature1 = 'empty ' if type(feature1) is str else feature1 
     feature2 = data_contents['question2'].apply(remove_punctuation)
+    feature2 = 'empty ' if type(feature2) is str else feature2
     features = feature1 + ' ~$#|#$~ ' + feature2
     features = features.iloc[:].values
     tk = keras.preprocessing.text.Tokenizer(num_words=10000, lower=True, split=" ")
@@ -41,7 +43,7 @@ if __name__ == '__main__':
     if not os.path.exists(filename):
 
         data_contents = pd.read_csv(os.path.join(dir_path, 'dataset','train.csv'), sep=', ', delimiter=',', header='infer', names=None)
-        data_contents = data_contents.dropna()
+        # data_contents = data_contents.dropna()
 
         feature = pre_processing(data_contents)
 
@@ -74,6 +76,7 @@ if __name__ == '__main__':
         model.add(Embedding(max_features, lstm_size, input_length=max_len))
         model.add(Dense(512, activation='softmax'))
         model.add(Bidirectional(LSTM(lstm_size, recurrent_dropout=0.2)))
+        model.add(Dropout(0.5))
         model.add(Dense(1, activation='relu'))
         model.compile(loss='mean_squared_error', optimizer='adam')
         model.summary()
@@ -87,7 +90,7 @@ if __name__ == '__main__':
     label_test_name = os.path.join(dir_path, 'data', '_label_test')
     if not os.path.exists(label_test_name):
 	    test_contents = pd.read_csv(os.path.join(dir_path, 'dataset','test.csv'), sep=', ', delimiter=',', header='infer', names=None)
-	    test_contents = test_contents.dropna()
+	    # test_contents = test_contents.dropna()
 	    test_contents = pre_processing(test_contents)
 	    label_contents = model.predict(test_contents, batch_size=batch_size)
 	    with open(label_test_name,'wb') as f:
