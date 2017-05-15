@@ -23,11 +23,17 @@ def remove_punctuation(s):
     return s
 
 
+def encode_empty_strings(question):
+    return ' #$%)() ' if not question.strip() else question 
+
+
 def pre_processing(data_contents):
-    feature1 = data_contents['question1'].apply(remove_punctuation)
-    feature1 = '#$%)() ' if type(feature1) is str else feature1 
-    feature2 = data_contents['question2'].apply(remove_punctuation)
-    feature2 = '#$%)() ' if type(feature2) is str else feature2
+    question1 = data_contents['question1'].astype(str)
+    question2 = data_contents['question2'].astype(str)
+    feature1 = question1.apply(remove_punctuation)
+    feature1 = np.vectorize(encode_empty_strings)(feature1)
+    feature2 = question2.apply(remove_punctuation)
+    feature2 = np.vectorize(encode_empty_strings)(feature2)
     features = feature1 + ' ~$#|#$~ ' + feature2
     features = features.iloc[:].values
     tk = keras.preprocessing.text.Tokenizer(num_words=10000, lower=True, split=" ")
