@@ -24,7 +24,10 @@ def remove_punctuation(s):
 
 
 def encode_empty_strings(question):
-    return ' #$%)() ' if not question.strip() else question 
+    return '%)()' if not question.strip() else question
+
+def merge_features(question1, question2):
+    return question1 + ' ~$#|#$~ ' + question2
 
 
 def pre_processing(data_contents):
@@ -34,8 +37,7 @@ def pre_processing(data_contents):
     feature1 = np.vectorize(encode_empty_strings)(feature1)
     feature2 = question2.apply(remove_punctuation)
     feature2 = np.vectorize(encode_empty_strings)(feature2)
-    features = feature1 + ' ~$#|#$~ ' + feature2
-    features = features.iloc[:].values
+    features = np.vectorize(merge_features)(feature1, feature2)
     tk = keras.preprocessing.text.Tokenizer(num_words=10000, lower=True, split=" ")
     tk.fit_on_texts(features)
     features = tk.texts_to_sequences(features)
