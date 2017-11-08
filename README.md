@@ -17,3 +17,9 @@ Please place the above file into `data/GoogleNews-vectors-negative300.bin`
 This phrase to Vec Implementation is based on an implementation by Aerin Kim
 
 Link - https://bitbucket.org/yunazzang/aiwiththebest_byor
+
+## Recurrent Neural Network (in progress)
+
+A recurrent neural network implementation is in progress.
+
+Later, the RNN will take word-embeddings as input
